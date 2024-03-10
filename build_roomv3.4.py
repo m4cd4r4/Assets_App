@@ -1,12 +1,13 @@
-# # Back to basics
-# Remove Serial #, ServiceNow #  Notes logic
+# # Back to basics - Complexity of Serial #, ServiceNow # & Notes integration has humbled me
+# Remove Serial #, ServiceNow # & Notes logic
 # Correct logic for >1 SAN input with a cancellation of a subsequent input dialog. ie If input count is 2, but 2nd SAN input is cancelled, only 1 count is applied to the sheet.
 # Add "right-click copy" data to clipboard
 # Add drop-down menu, and include inventory diagram scripts, All SANs log & option to open the spreadsheet (Also remove the .xlsx button from the header)
 # Add volume to "Action" column. ie "Add 2", "Subtract 4" 
 # Adjust the width of the logview & treeview columns for improved readability
+# Modify the logic to ensure a SAN number being subtracted corresponds with the associated item
 
-# Build Room\build_roomv3.2.py
+# Build Room\build_roomv3.4.py
 # Author: Macdara O Murchu
 # 10.03.24
 
@@ -299,16 +300,17 @@ def update_count(operation):
                         else:
                             tk.messagebox.showerror("Error", "Duplicate or already used SAN number.", parent=root)
                     elif operation == 'subtract':
-                        # Search for the SAN in all_sans_sheet and remove if found
+                        # Search for the SAN in all_sans_sheet and remove if found and matches the item
                         for row in all_sans_sheet.iter_rows(min_row=2):
-                            if row[0].value == san_number:
+                            if row[0].value == san_number and row[1].value == selected_item:
                                 all_sans_sheet.delete_rows(row[0].row)
                                 log_change(selected_item, operation, san_number, timestamp_sheet, volume=1)
                                 workbook.save(workbook_path)
                                 entered_sans_count += 1
                                 break
-                        else:  # Executed if the loop completes without breaking (SAN not found)
-                            tk.messagebox.showerror("Error", f"SAN number {san_number} does not exist.", parent=root)
+                        else:  # Executed if the loop completes without breaking (SAN not found or doesn't match item)
+                            tk.messagebox.showerror("Error", f"SAN number {san_number} does not match the selected item.", parent=root)
+
 
             for row in item_sheet.iter_rows(min_row=2):
                 if row[0].value == selected_item:
