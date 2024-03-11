@@ -93,7 +93,7 @@ def view_all_sans_log():
 
 root = ctk.CTk()
 root.title("Perth EUC Stock")
-root.geometry("600x750")
+root.geometry("600x800")
 
 menu_bar = tk.Menu(root)
 plots_menu = tk.Menu(menu_bar, tearoff=0)
