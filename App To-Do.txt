@@ -1,0 +1,4 @@
+- Remove SAN items from the loop that writes "add4", "Subtract 6" etc
+- Extended to 800x650
+- Add a sheet called Level 17 & put a button to open a log. This sheet will be manually updated.
+* Add 13 24" monitors to the Level 17 sheet.
