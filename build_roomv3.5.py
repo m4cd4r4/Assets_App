@@ -2,7 +2,9 @@
 # Author: Macdara O Murchu
 # 06.05.24
 
-# Workbook is now selected via a File Explorer dialog.
+# Workbook is now selected via a File Explorer dialog
+# Debug: Data validation may be disabled for SANs - Fix: Following had gone missing somehow - "from tkinter import messagebox"
+# When app is closed, terminal stays loaded
 
 import logging.config
 from pathlib import Path
@@ -15,6 +17,7 @@ from openpyxl import load_workbook, Workbook
 from datetime import datetime
 import subprocess
 from tkinter import filedialog
+from tkinter import messagebox
 
 logging_conf_path = Path('logging.conf')
 if logging_conf_path.exists() and logging_conf_path.stat().st_size > 0:
@@ -100,7 +103,8 @@ plots_menu.add_command(label="Open Spreadsheet", command=open_spreadsheet)
 menu_bar.add_cascade(label="Data", menu=plots_menu)
 root.config(menu=menu_bar)
 
-# script_directory = Path(__file__).parent
+script_directory = Path(__file__).parent
+
 # workbook_path = script_directory / 'EUC_Perth_Assets.xlsx'
 # if Path(workbook_path).exists():
 #     workbook = load_workbook(workbook_path)
