@@ -1,11 +1,8 @@
-# Added io, requests_negotiate_sspi & HttpNegotiateAuth to enable utilising the Windows logged in user's credentials to seamlessly authenticate
-# the access to the spreadsheet located in the Perth EUC Teams SharePoint
-# * Requires that the user is in the "Shared With" list for the EUC_Perth_Assets.xlsx file
-
-
 # Build Room\build_roomv3.5.py
 # Author: Macdara O Murchu
-# 23.03.24
+# 06.05.24
+
+# Workbook is now selected via a File Explorer dialog.
 
 import logging.config
 from pathlib import Path
@@ -17,44 +14,7 @@ from tkinter import ttk
 from openpyxl import load_workbook, Workbook
 from datetime import datetime
 import subprocess
-import io
-import requests
-from requests_negotiate_sspi import HttpNegotiateAuth
-
-# Define your SharePoint base URL here
-sharepoint_url = "https://santos.sharepoint.com/sites/EndUserComputing-PERTHEUC"
-
-# The specific URL to the Excel file, including the path within the SharePoint site
-file_url = sharepoint_url + "/Shared%20Documents/PERTH%20EUC/Stocktake%20Perth/EUC_Perth_Assets.xlsx"
-
-def download_excel_from_sharepoint_with_sspi(file_url):
-    """
-    Download an Excel file from SharePoint using Windows Integrated Authentication (SSPI).
-
-    :param file_url: The full URL to the Excel file.
-    :return: An io.BytesIO object of the Excel file or None if an error occurs.
-    """
-    try:
-        auth = HttpNegotiateAuth()
-        response = requests.get(file_url, auth=auth, verify=True)
-
-        if response.status_code == 200:
-            return io.BytesIO(response.content)
-        else:
-            logging.error(f"Failed to download file, HTTP status code: {response.status_code}")
-            return None
-    except Exception as e:
-        logging.error(f"Failed to download Excel file from SharePoint: {e}")
-        return None
-
-# Example usage
-file_bytes_io = download_excel_from_sharepoint_with_sspi(file_url)
-
-if file_bytes_io:
-    workbook = load_workbook(file_bytes_io)
-    # You can now use the workbook object as needed
-else:
-    logging.error("Failed to load workbook from SharePoint.")
+from tkinter import filedialog
 
 logging_conf_path = Path('logging.conf')
 if logging_conf_path.exists() and logging_conf_path.stat().st_size > 0:
@@ -127,7 +87,7 @@ def view_all_sans_log():
 
 root = ctk.CTk()
 root.title("Perth EUC Stock")
-root.geometry("600x800")
+root.geometry("600x750")
 
 menu_bar = tk.Menu(root)
 plots_menu = tk.Menu(menu_bar, tearoff=0)
@@ -140,23 +100,41 @@ plots_menu.add_command(label="Open Spreadsheet", command=open_spreadsheet)
 menu_bar.add_cascade(label="Data", menu=plots_menu)
 root.config(menu=menu_bar)
 
-script_directory = Path(__file__).parent
-workbook_path = script_directory / 'EUC_Perth_Assets.xlsx'
-if Path(workbook_path).exists():
-    workbook = load_workbook(workbook_path)
-else:
-    workbook = Workbook()
-    workbook.active.title = '4.2_Items'
-    workbook.create_sheet('4.2_Timestamps')
-    workbook.create_sheet('BR_Items')
-    workbook.create_sheet('BR_Timestamps')
-    workbook.create_sheet('All_SANs')
-    workbook['4.2_Items'].append(["Item", "LastCount", "NewCount"])
-    workbook['4.2_Timestamps'].append(["Timestamp", "Item", "Action", "SAN_Number"])
-    workbook['BR_Items'].append(["Item", "LastCount", "NewCount"])
-    workbook['BR_Timestamps'].append(["Timestamp", "Item", "Action", "SAN_Number"])
-    workbook['All_SANs'].append(["SAN_Number", "Item", "Timestamp"])
-    workbook.save(workbook_path)
+# script_directory = Path(__file__).parent
+# workbook_path = script_directory / 'EUC_Perth_Assets.xlsx'
+# if Path(workbook_path).exists():
+#     workbook = load_workbook(workbook_path)
+# else:
+#     workbook = Workbook()
+#     workbook.active.title = '4.2_Items'
+#     workbook.create_sheet('4.2_Timestamps')
+#     workbook.create_sheet('BR_Items')
+#     workbook.create_sheet('BR_Timestamps')
+#     workbook.create_sheet('All_SANs')
+#     workbook['4.2_Items'].append(["Item", "LastCount", "NewCount"])
+#     workbook['4.2_Timestamps'].append(["Timestamp", "Item", "Action", "SAN_Number"])
+#     workbook['BR_Items'].append(["Item", "LastCount", "NewCount"])
+#     workbook['BR_Timestamps'].append(["Timestamp", "Item", "Action", "SAN_Number"])
+#     workbook['All_SANs'].append(["SAN_Number", "Item", "Timestamp"])
+#     workbook.save(workbook_path)
+
+# Function to prompt the user to select a file
+def get_file_path():
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+    file_path = filedialog.askopenfilename(
+        title="Select a spreadsheet file",
+        filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*"))
+    )
+    if not file_path:
+        tk.messagebox.showerror("Error", "No file selected. Exiting application.")
+        root.destroy()
+        raise SystemExit  # Exit the application if no file is selected
+    return file_path
+
+# Get the workbook path from user
+workbook_path = get_file_path()
+workbook = load_workbook(workbook_path)
 
 all_sans_sheet = workbook['All_SANs']
 sheets = {'original': ('4.2_Items', '4.2_Timestamps'), 'backup': ('BR_Items', 'BR_Timestamps')}
