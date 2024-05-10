@@ -4,10 +4,10 @@
 
 # Workbook is now selected via a File Explorer dialog
 # DONE(?) # Debug: Data validation may be disabled for SANs - Fix: Following had gone missing somehow - "from tkinter import messagebox"
-# When app is closed, terminal stays loaded
-# Plot scripts still point to old workbook path for data. Change to match main script.
+# To-Do: When app is closed, terminal stays loaded
+# DONE # Plot scripts still point to old workbook path for data. Change to match main script.
 
-# Create config.py to save workbook apth, so that it can be loaded into the "inventory-levels" scripts
+# Create config.py to save workbook path, so that it can be loaded into the "inventory-levels" scripts
 
 import logging.config
 from pathlib import Path
@@ -131,17 +131,17 @@ script_directory = Path(__file__).parent
 #     workbook['All_SANs'].append(["SAN_Number", "Item", "Timestamp"])
 #     workbook.save(workbook_path)
 
-# Function to prompt the user to select a file
 def get_file_path():
-    root = tk.Tk()
-    root.withdraw()  # Hide the root window
+    # Creating a temporary root window for file dialog
+    temp_root = tk.Tk()
+    temp_root.withdraw()  # Hide the temporary root window
     file_path = filedialog.askopenfilename(
         title="Select a spreadsheet file",
         filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*"))
     )
+    temp_root.destroy()  # Destroy the temporary root window to clean up
     if not file_path:
         tk.messagebox.showerror("Error", "No file selected. Exiting application.")
-        root.destroy()
         raise SystemExit  # Exit the application if no file is selected
     return file_path
 
@@ -403,22 +403,6 @@ def add_copy_option(tree):
 # Apply the add_copy_option function to the Treeviews
 add_copy_option(tree)
 add_copy_option(log_view)
-
-
-# Closing protocol and the function
-
-def on_close():
-    # Cancel all pending "after" calls
-    for job in root.tk.call('after', 'info'):
-        root.after_cancel(job)
-    
-    # Now it's safe to destroy the window
-    root.destroy()
-
-# Set this to handle window close event
-root.protocol("WM_DELETE_WINDOW", on_close)
-
-# Remainder of your GUI setup, including the main loop
 
 root.after(100, update_treeview)
 update_log_view()
