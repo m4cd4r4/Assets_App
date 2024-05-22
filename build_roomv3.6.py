@@ -7,7 +7,7 @@
 # To-Do: When app is closed, terminal stays loaded
 # DONE # Plot scripts still point to old workbook path for data. Change to match main script.
 
-# Create config.py to save workbook path, so that it can be loaded into the "inventory-levels" scripts
+# Create config.py to save workbook apth, so that it can be loaded into the "inventory-levels" scripts
 
 import logging.config
 from pathlib import Path
@@ -91,10 +91,18 @@ def view_all_sans_log():
     # Load and display data from the "All SANs" sheet
     if 'All_SANs' in workbook.sheetnames:
         all_sans_sheet = workbook['All_SANs']
-        for row in all_sans_sheet.iter_rows(min_row=2, values_only=True):
+        san_rows = [row for row in all_sans_sheet.iter_rows(min_row=2, values_only=True) if row[0]]
+
+        # Sort the rows based on the numerical part of the SAN number
+        sorted_san_rows = sorted(san_rows, key=lambda x: int(x[0].replace("SAN", "")))
+
+        for row in sorted_san_rows:
             log_tree.insert('', 'end', values=row)
     else:
         tk.messagebox.showinfo("Info", "All_SANs log is empty.", parent=log_window)
+
+# Call this function in the appropriate place to show the sorted SANs log
+
 
 
 root = ctk.CTk()
