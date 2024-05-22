@@ -1,5 +1,3 @@
-# Reads workbook path from config.py, which is written to via main script (build_roomv[x].py)
-
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -52,11 +50,16 @@ plots_folder = os.path.join(os.path.dirname(workbook_path), 'Plots')
 if not os.path.exists(plots_folder):
     os.makedirs(plots_folder)
 
+# Check and create today's date folder inside 'Plots'
+today_folder = os.path.join(plots_folder, datetime.now().strftime('%d-%m-%Y'))
+if not os.path.exists(today_folder):
+    os.makedirs(today_folder)
+
 # Get current date and time for file name
-current_datetime = datetime.now().strftime('%d.%m.%y-%H.%M.%S')
+current_datetime = datetime.now().strftime('%H.%M.%S')
 
 # Construct the full file path for saving the plot
-file_name = os.path.join(plots_folder, f'combined_inventory_levels_{current_datetime}.png')
+file_name = os.path.join(today_folder, f'combined_inventory_levels_{current_datetime}.png')
 
 # Save and show the plot
 plt.savefig(file_name)
