@@ -3,11 +3,11 @@
 # 09.05.24
 
 # Workbook is now selected via a File Explorer dialog
-# DONE(?) # Debug: Data validation may be disabled for SANs - Fix: Following had gone missing somehow - "from tkinter import messagebox"
-# To-Do: When app is closed, terminal stays loaded
+# DONE # Debug: Data validation may be disabled for SANs - Fix: Following had gone missing somehow - "from tkinter import messagebox"
+# DONE # When app is closed, terminal stays loaded
 # DONE # Plot scripts still point to old workbook path for data. Change to match main script.
 
-# Create config.py to save workbook apth, so that it can be loaded into the "inventory-levels" scripts
+# TO-DO: config.py to save workbook path, so that it can be loaded into the "inventory-levels" scripts
 
 import logging.config
 from pathlib import Path
